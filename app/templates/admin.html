@@ -1,0 +1,82 @@
+{% extends "base.html" %}{% block title %}Administration{% endblock %}
+{% block content %}
+<h1>Administration</h1>
+<h2>Users</h2>
+<div class="table-wrap">
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Active</th>
+            <th>Blocked</th>
+            <th>Locked until</th>
+            <th>Failed logins</th>
+            <th>Actions</th>
+        </tr>
+        {% for item in users %}
+        <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.email }}</td>
+            <td>{{ item.full_name }}</td>
+            <td>{{ item.role }}</td>
+            <td>{{ item.is_active }}</td>
+            <td>{{ item.is_blocked }}</td>
+            <td>{{ item.locked_until or '—' }}</td>
+            <td>{{ failed_counts.get(item.id, 0) }}</td>
+            <td>{% if item.id != user.id %}
+                <form method="post" action="/admin/users/{{ item.id }}/{{ 'unblock' if item.is_blocked else 'block' }}">
+                    <button>{{ 'Unblock' if item.is_blocked else 'Block' }}</button>
+                </form>
+                {% if item.role == 'admin' %}
+                <form method="post" action="/admin/users/{{ item.id }}/remove-admin">
+                    <button>Revoke admin</button>
+                </form>
+                {% else %}
+                <form method="post" action="/admin/users/{{ item.id }}/make-admin">
+                    <button>Make admin</button>
+                </form>
+                {% endif %}{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+<h2>Recent audit events</h2>
+<form method="get" action="/admin">
+    <label>Email <input name="email" value="{{ filter_email }}" placeholder="user@example.com"></label>
+    <label>Event
+        <select name="action">
+            <option value="">All events</option>
+            {% for option in ["login_success", "login_failed", "login_locked", "admin_blocked_user",
+            "admin_unblocked_user", "admin_granted", "admin_revoked"] %}
+            <option value="{{ option }}" {% if filter_action== option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>IP <input name="ip" value="{{ filter_ip }}" placeholder="127.0.0.1"></label>
+    <button>Filter</button>
+    <a href="/admin">Reset</a>
+</form>
+<div class="table-wrap">
+    <table>
+        <tr>
+            <th>Time</th>
+            <th>Action</th>
+            <th>Email</th>
+            <th>User ID</th>
+            <th>IP</th>
+        </tr>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.event.created_at }}</td>
+            <td>{{ log.event.action }}</td>
+            <td>{{ log.email or '—' }}</td>
+            <td>{{ log.event.user_id or '—' }}</td>
+            <td>{{ log.event.ip_address or '—' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

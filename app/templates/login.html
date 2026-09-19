@@ -1,0 +1,37 @@
+{% extends "base.html" %}{% block title %}Sign in{% endblock %}
+{% block content %}
+<h1>Sign in</h1>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form method="post" action="/auth/login-form">
+    {% if step == "verification" %}
+    <input type="hidden" name="step" value="verification">
+    <input type="hidden" name="email" value="{{ email }}">
+    <input type="hidden" name="password" value="">
+    <input type="hidden" name="pending_token" value="{{ pending_token }}">
+    <p>First step completed for <strong>{{ email }}</strong>.</p>
+    {% if cloudflare_turnstile_enabled %}
+    <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+    <input type="hidden" name="turnstile_token" value="">
+    {% else %}
+    <p>CAPTCHA: <strong>{{ question }}</strong></p>
+    <input type="hidden" name="captcha_token" value="{{ captcha_token }}">
+    <label>CAPTCHA answer <input name="captcha_answer" required autofocus></label>
+    {% endif %}
+    {% if requires_mfa %}
+    <label>MFA code <input name="totp_code" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code"
+                           required></label>
+    {% endif %}
+    <button>Complete sign in</button>
+    {% else %}
+    <input type="hidden" name="step" value="credentials">
+    <label>Email <input type="email" name="email" required autofocus></label>
+    <label>Password <input type="password" name="password" required>
+        <button type="button" class="password-toggle">Show</button>
+        <small class="password-length"></small></label>
+    <button>Continue</button>
+    {% endif %}
+</form>
+<p><a href="/register">Create account</a> · <a href="/forgot-password">Forgot password?</a></p>
+<p><a href="/auth/oauth/google">Sign in with Google</a> ·
+    <a href="/auth/oauth/github">Sign in with GitHub</a></p>
+{% endblock %}

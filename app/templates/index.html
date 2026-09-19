@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Secure Account{% endblock %}
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Secure account management</p>
+        <h1>Secure Account</h1>
+        <p class="lead">A secure system for registration, authentication, 2FA, and access control.</p>
+        {% if user %}
+        <div class="welcome">
+            <span class="status-dot"></span>
+            <span>You are signed in as <strong>{{ user.full_name or user.email }}</strong><br>
+        <small>{{ user.email }}</small></span>
+        </div>
+        <div class="actions">
+            <a class="button primary" href="/profile">Open profile</a>
+            {% if user.role == "admin" %}<a class="button secondary" href="/admin">Admin panel</a>{% endif %}
+            <form method="post" action="/auth/logout">
+                <button class="button secondary">Sign out</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="actions">
+            <a class="button primary" href="/login">Sign in</a>
+            <a class="button secondary" href="/register">Create account</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="hero-mark" aria-hidden="true">✓</div>
+</section>
+
+<section class="feature-grid">
+    <article class="feature"><h2>Strong protection</h2>
+        <p>Argon2id, CAPTCHA, and brute-force protection.</p></article>
+    <article class="feature"><h2>Two-factor authentication</h2>
+        <p>TOTP with a QR code for an additional security layer.</p></article>
+    <article class="feature"><h2>Control and audit</h2>
+        <p>Account management and audit logs for administrators.</p></article>
+</section>
+{% endblock %}
