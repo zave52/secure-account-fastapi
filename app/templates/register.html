@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% block title %}Create account{% endblock %}
+{% block content %}
+<h1>Create account</h1>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form method="post" action="/auth/register-form">
+    <label>Name <input name="full_name" maxlength="120" value="{{ full_name or '' }}"></label>
+    <label>Email <input type="email" name="email" required value="{{ email or '' }}"></label>
+    <label>Password <input type="password" name="password" required minlength="8" id="password">
+        <button type="button" class="password-toggle">Show</button>
+        <small class="password-length"></small></label>
+    <small>8+ characters, uppercase/lowercase letter, digit, and special character.</small>
+    <small id="password-strength"></small>
+    {% if cloudflare_turnstile_enabled %}
+    <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+    {% else %}
+    <p>CAPTCHA: <strong>{{ question }}</strong></p>
+    <input type="hidden" name="captcha_token" value="{{ captcha_token }}">
+    <label>Answer <input name="captcha_answer" required></label>
+    {% endif %}
+    <button>Create account</button>
+</form>
+{% endblock %}

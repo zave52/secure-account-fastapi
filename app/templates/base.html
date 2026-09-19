@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{% block title %}Secure Account{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script defer src="/static/app.js?v=3"></script>
+    {% if cloudflare_turnstile_enabled %}
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    {% endif %}
+</head>
+<body>
+<main class="card">
+    <nav class="topbar">
+        <a class="brand" href="/">Secure Account</a>
+        <span class="nav-links">
+      {% if user %}<a href="/profile">Profile</a>{% if user.role == "admin" %}<a href="/admin">Admin</a>{% endif %}{% else %}<a
+                href="/login">Sign in</a>{% endif %}
+      <a href="/docs">API documentation</a>
+    </span>
+    </nav>
+    {% block content %}{% endblock %}
+</main>
+</body>
+</html>
